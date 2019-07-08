@@ -12,6 +12,7 @@
   </li>
 </template>
 <script>
+import PubSub from 'pubsub-js'
 export default {
   computed: {
     //get操作和set操作
@@ -23,7 +24,8 @@ export default {
       set(val){
         //如果何止了isCompleted属性的值,此时val就是设置的值(选中了:true,没选中:false)
         //设置当前的todo的isShow
-        this.toggleTodo(this.todo)
+        //this.toggleTodo(this.todo)
+        this.$bus.$emit('toggleTodo',this.todo)
       }
     }
   },
@@ -31,7 +33,11 @@ export default {
     //删除操作
     del() {
       if (confirm("您确定删除吗")) {
-        this.deleteTodo(this.index);
+         //console.log(this.index)
+        //发布消息
+        PubSub.publish('deleteTodo', this.index);
+       
+        //this.deleteTodo(this.index);
       }
     },
     //鼠标进入和离开操作
@@ -59,8 +65,6 @@ export default {
   props: {
     index: Number,
     todo: Object,
-    deleteTodo: Function,
-    toggleTodo: Function
   }
 };
 </script>

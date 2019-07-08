@@ -4,7 +4,12 @@
   </div>
 </template>
 <script>
+import Vue from 'vue'
 export default {
+  mounted () {
+    //结论:子级组件----->App.vue-----vm------Vue
+    //console.log(this.__proto__.__proto__===Vue.prototype)
+  },
 
   //写方法的
   methods: {

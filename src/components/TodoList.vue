@@ -1,6 +1,6 @@
 <template>
   <ul class="todo-main">
-    <TodoItem v-for="(todo,index) in todos" :key="todo.id" :todo="todo" :deleteTodo="deleteTodo" :index="index" :toggleTodo="toggleTodo"></TodoItem>
+    <TodoItem v-for="(todo,index) in todos" :key="todo.id" :todo="todo" :index="index" ></TodoItem>
   </ul>
 </template>
 <script>
@@ -9,7 +9,7 @@ import TodoItem from './TodoItem.vue'
 export default {
 
 //组件之间的通信可以使用props对象,当前的组件(此时在该组件内部,如果使用this,this是当前组件这个实例对象)this.todos---可以直接使用
-  props: ['todos','deleteTodo','toggleTodo'],
+  props: ['todos'],
   //注册组件
   components: {
     TodoItem

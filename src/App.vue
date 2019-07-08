@@ -2,7 +2,7 @@
   <div class="todo-container">
     <div class="todo-wrap">
       <TodoHeader @addTodo="addTodo"></TodoHeader>
-      <TodoList :todos="todos" :deleteTodo="deleteTodo" :toggleTodo="toggleTodo"></TodoList>
+      <TodoList :todos="todos"></TodoList>
       <TodoFooter>
         <label slot="left">
           <input type="checkbox" v-model="isChecked" />
@@ -19,6 +19,9 @@
   </div>
 </template>
 <script>
+//引入PubSub
+import PubSub from "pubsub-js";
+
 //引入三个子组件
 import TodoHeader from "./components/TodoHeader.vue";
 import TodoList from "./components/TodoList.vue";
@@ -28,30 +31,53 @@ import TodoFooter from "./components/TodoFooter.vue";
 import Storage from "./utils/utils.js";
 
 export default {
+  beforeDestroy () {
+      //销毁实例对象之前
+      //消息订阅取消了
+      PubSub.unsubscribe(this.token)
+      //绑定的事件解绑
+      this.$bus.$off('toggleTodo')
+  },
+  //界面显示后
+  mounted() {
+    //console.log('界面显示后')
+    //订阅消息----实现删除操作
+    //PubSub.subscribe('deleteTodo',function(){})//不行
+    this.token=PubSub.subscribe("deleteTodo", (index,data) => {
+      //在methods中定义的
+      this.deleteTodo(data);
+    }); //可以
 
-    //计算属性
+    //通过事件总线绑定一个toggleTodo的操作
+    //绑定事件监听的方法
+    this.$bus.$on('toggleTodo',(todo)=>{
+      this.toggleTodo(todo)
+    })
+  },
+
+  //计算属性
   computed: {
     //选中的个数
-      count(){
-        //有多少个选中了,count就是多少
-        return this.todos.reduce((pre,todo)=>pre+(todo.isShow?1:0),0)
-      },
+    count() {
+      //有多少个选中了,count就是多少
+      return this.todos.reduce((pre, todo) => pre + (todo.isShow ? 1 : 0), 0);
+    },
     //选中的状态
-    isChecked:{
+    isChecked: {
       //当前复选框是否选中,就看todos中有多少个todo及一共选中的个数和前面的todos.length是否一致
-      get(){
-        return this.todos.length===this.count&&this.count>0
+      get() {
+        return this.todos.length === this.count && this.count > 0;
       },
-      set(val){
+      set(val) {
         //设置当前的选中状态,改变的是todos中所有的todo的isShow
-        this.checkAllTodos(val)
+        this.checkAllTodos(val);
       }
     }
   },
   methods: {
     //为数组中添加一个对象数据
     addTodo(todo) {
-      console.log('触发没')
+      console.log("触发没");
       this.todos.unshift(todo);
     },
     //删除数据的方法
@@ -103,6 +129,10 @@ export default {
     TodoList,
     TodoFooter
   }
+  // mounted() {
+  //   //此时在App.vue组件中
+  //   // console.log(this)//确实是一个对象----VueComponent
+  // }
 };
 
 // var obj={
